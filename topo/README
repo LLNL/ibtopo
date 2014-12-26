@@ -1,0 +1,40 @@
+To run this command:
+
+  ./topo ../ibnet/machine.ibnet > machine.topo
+
+The files in this directory look like the following:
+
+rzmerl156<132>: head topo/sierra.topo
+3
+sierra0 0 0 7
+sierra1 0 0 7
+sierra2 0 0 7
+sierra4 0 0 7
+sierra5 0 0 7
+sierra6 0 0 7
+sierra7 0 0 7
+sierra10 0 0 7
+sierra11 0 0 7
+
+The way our fat tree networks are constructed (Clos network) presents
+a nice mathematical closure property that topo takes advantage of to
+express topology in a concise way.  The first line specifies the number
+of switch levels in the fat tree network.  Then there is a line
+for each node (nodes are missing if they were down when ibnetdiscover
+was run).  Following the node name, there is an integer id listed for
+each switch level (3 in the case of sierra).  For a given level, nodes
+with the same id are in the same switch group.  The first id is the
+highest switch level and the last id is the lowest switch level.
+
+If you want to know the number of hops between two nodes, compare the
+ids from right to left.  If the right-most id matches, the nodes will
+bounce a message off the 1st-level switches (2 network links).  If the
+middle id matches, the nodes will bounce a message off the 2nd-level
+switches (4 links), and finally the left-most id is guaranteed to match
+since this is a 3-level network (6 links).
+
+As a particular use case, imagine that you wanted to create
+communicators from MPI_COMM_WORLD, in which all procs in the
+communicator are connected to the same first-level switch.  Then, you'd
+have each process look up the line corresponding to its hostname, then
+pass in the right-most id as the color argument to MPI_Comm_split.

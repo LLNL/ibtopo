@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+use strict;
+use lib '../perl';
+use ibnetfattree;
+
+if (@ARGV != 1) {
+  print "Usage:\n  ibnetdiscover > file.ibnet\n  topo file.ibnet > file.topo\n";
+  exit 1;
+}
+
+my $file = shift @ARGV;
+
+if (not -r $file) {
+  print "File not found: $file\n";
+  exit 1;
+}
+
+# process ibnetdiscover file as a fat tree
+my $tree = new ibnetfattree($file);
+
+# get the number of levels in the tree
+my $num_levels = $tree->num_levels();
+my $num_switch_levels = $num_levels - 1;
+print "$num_switch_levels\n";
+
+# build a list of hca's ordered by node name
+my %name2hca = ();
+my @hcas = $tree->list_hcas();
+foreach my $hca (@hcas) {
+  my $name = $tree->name($hca);
+  if (defined $name2hca{$hca}) {
+    print "ERROR: $name corresponds to multiple hcas\n";
+  }
+  $name2hca{$name} = $hca;
+}
+
+# for each hca, print out the switch id for each level
+foreach my $name (sort {($a =~ /(\d+)$/)[0] <=> ($b =~ /(\d+)$/)[0]} keys %name2hca) {
+  my $hca = $name2hca{$name};
+
+  my @items = ();
+  push @items, $name;
+  for (my $level = $num_levels - 1; $level >= 1; $level--) {
+    my $id = $tree->leaf_at_level($hca, $level);
+    push @items, $id;
+  }
+
+  print join(" ", @items), "\n";
+}
