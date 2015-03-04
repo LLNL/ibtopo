@@ -1,3 +1,12 @@
+# Copyright (c) 2015, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by Adam Moody <moody20@llnl.gov>.
+# LLNL-CODE-667975.
+# All rights reserved.
+# This file is part of the IBTopo packag.
+# For details, see https://github.com/hpc/ibtopo
+# Please also read the LICENSE file.
+
 package ibnetfattree;
 use strict;
 use vars qw(@ISA);

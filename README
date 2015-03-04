@@ -1,0 +1,30 @@
+The IBTopo package contains a set of perl modules and a script
+that uses the modules to process network connectivity information.
+
+The perl modules parse output from ibnetdiscover and present
+abstractions for different network topologies.  In particular, there
+are three interfaces:
+
+ibnetdiscover
+Interface to read ibnetdiscover output.
+
+ibnetupdown
+Interface to read network info assuming an up/down network, meaning
+all HCAs and switches can be classified as belonging to a certain
+level, with all HCAs at the level 0, all leaf switches at level 1,
+and other switches at higher levels.  Such a network has the property
+that for an object at a level i, each link is either a down link which
+connects to an object at level i-1 or each link is an up link which
+connects to an object at level i+1.
+
+ibnetfattree
+Interface assuming a particular type of up/down network in which
+all objects at a given level can be grouped, so that one can send a
+packet from any object in the group and reach any other object in the
+group with the same number of network hops.
+
+The topo script uses the ibnetfattree module to process ibnetdiscover
+output and produce HCA grouping information.  It assigns IDs to each
+HCA for each level in the network, which consicely describes the number
+of hops between any pair of HCAs in the system.  See the topo/README
+file for more info.
